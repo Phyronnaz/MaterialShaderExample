@@ -24,6 +24,8 @@ void AMaterialShaderExampleActor::Tick(float DeltaSeconds)
 		return;
 	}
 
+	Subsystem->LocalToWorld = GetActorTransform();
+	Subsystem->MaterialSelector = MaterialSelector;
 	Subsystem->MaterialToReplace = MaterialToReplace;
 	Subsystem->NewMaterials = NewMaterials;
 }

@@ -1,5 +1,6 @@
 ﻿// Copyright Voxel Plugin SAS. All Rights Reserved.
 
+using System.IO;
 using UnrealBuildTool;
 
 public class MaterialShaderExample : ModuleRules
@@ -18,6 +19,14 @@ public class MaterialShaderExample : ModuleRules
 			"SlateCore",
 			"Projects",
 			"RenderCore",
+			"Renderer",
+			"RHI",
+		});
+
+		PrivateIncludePaths.AddRange(new string[]
+		{
+			Path.Combine(GetModuleDirectory("Renderer"), "Private"),
+			Path.Combine(GetModuleDirectory("Renderer"), "Internal"),
 		});
 	}
 }

@@ -1,11 +1,11 @@
 // Copyright Voxel Plugin SAS. All Rights Reserved.
 
 #include "MaterialShaderExampleSubsystem.h"
-#include "ExampleSceneExtension.h"
+#include "ExampleSceneViewExtension.h"
 
 void UMaterialShaderExampleSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
-	SceneViewExtension = FSceneViewExtensions::NewExtension<FExampleSceneExtension>();
+	SceneViewExtension = FSceneViewExtensions::NewExtension<FExampleSceneViewExtension>();
 }
 
 void UMaterialShaderExampleSubsystem::Tick(float DeltaTime)
@@ -16,6 +16,25 @@ void UMaterialShaderExampleSubsystem::Tick(float DeltaTime)
 		// We reuse the VirtualHeightfieldMesh flag, see FExampleMaterialShader::ShouldCompilePermutation
 		MaterialSelector->CheckMaterialUsage(MATUSAGE_VirtualHeightfieldMesh);
 	}
+
+	if (!SceneViewExtension)
+	{
+		return;
+	}
+
+	// Copy data to the render thread
+	ENQUEUE_RENDER_COMMAND(MaterialShaderExampleSubsystemCopy)([
+		SceneViewExtension = SceneViewExtension,
+		LocalToWorld = LocalToWorld,
+		MaterialSelector = MaterialSelector,
+		MaterialToReplace = MaterialToReplace,
+		NewMaterials = NewMaterials](FRHICommandList& RHICmdList)
+	{
+		SceneViewExtension->LocalToWorld = LocalToWorld;
+		SceneViewExtension->MaterialSelector = MaterialSelector;
+		SceneViewExtension->MaterialToReplace = MaterialToReplace;
+		SceneViewExtension->NewMaterials = NewMaterials;
+	});
 }
 
 TStatId UMaterialShaderExampleSubsystem::GetStatId() const

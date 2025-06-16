@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "MaterialShaderExampleSubsystem.generated.h"
 
-class FExampleSceneExtension;
+class FExampleSceneViewExtension;
 
 UCLASS()
 class UMaterialShaderExampleSubsystem
@@ -16,10 +16,13 @@ class UMaterialShaderExampleSubsystem
 
 public:
 	UPROPERTY()
-	TObjectPtr<UMaterialInterface> MaterialToReplace;
+	FTransform LocalToWorld;
 
 	UPROPERTY()
 	TObjectPtr<UMaterialInterface> MaterialSelector;
+
+	UPROPERTY()
+	TObjectPtr<UMaterialInterface> MaterialToReplace;
 
 	UPROPERTY()
 	TArray<TObjectPtr<UMaterialInterface>> NewMaterials;
@@ -35,5 +38,5 @@ public:
 	//~ End FTickableGameObject Interface
 
 private:
-	TSharedPtr<FExampleSceneExtension> SceneViewExtension;
+	TSharedPtr<FExampleSceneViewExtension> SceneViewExtension;
 };

@@ -12,6 +12,9 @@ class AMaterialShaderExampleActor : public AActor
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Config")
+	TObjectPtr<UMaterialInterface> MaterialSelector;
+
+	UPROPERTY(EditAnywhere, Category = "Config")
 	TObjectPtr<UMaterialInterface> MaterialToReplace;
 
 	UPROPERTY(EditAnywhere, Category = "Config")
