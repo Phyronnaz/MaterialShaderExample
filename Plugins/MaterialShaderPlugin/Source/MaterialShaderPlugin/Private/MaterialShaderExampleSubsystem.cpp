@@ -41,3 +41,8 @@ TStatId UMaterialShaderExampleSubsystem::GetStatId() const
 {
 	RETURN_QUICK_DECLARE_CYCLE_STAT(UMaterialShaderExampleSubsystem, STATGROUP_Tickables);
 }
+
+bool UMaterialShaderExampleSubsystem::IsTickableInEditor() const
+{
+	return true;
+}

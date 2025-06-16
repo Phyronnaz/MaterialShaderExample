@@ -35,6 +35,7 @@ public:
 	//~ Begin FTickableGameObject Interface
 	virtual void Tick(float DeltaTime) override;
 	virtual TStatId GetStatId() const override;
+	virtual bool IsTickableInEditor() const override;
 	//~ End FTickableGameObject Interface
 
 private:
