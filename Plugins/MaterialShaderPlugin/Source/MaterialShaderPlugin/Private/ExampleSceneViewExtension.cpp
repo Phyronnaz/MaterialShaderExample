@@ -14,6 +14,24 @@
 #include "Materials/MaterialRenderProxy.h"
 #include "Rendering/NaniteStreamingManager.h"
 
+// Hack needed because nanite parameters are not exported
+
+#if !IS_MONOLITHIC
+const FShaderParametersMetadata* FNaniteShadingUniformParameters::GetStructMetadata()
+{
+	return FShaderParametersMetadata::GetNameStructMap().FindChecked(FHashedName(TEXT("NaniteShading")));
+}
+
+const FShaderParametersMetadata* FNaniteRasterUniformParameters::GetStructMetadata()
+{
+	return FShaderParametersMetadata::GetNameStructMap().FindChecked(FHashedName(TEXT("NaniteRaster")));
+}
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
 FExampleSceneViewExtension::~FExampleSceneViewExtension()
 {
 	ENQUEUE_RENDER_COMMAND(DestroyExampleSceneExtension)([PrimitiveUniformBuffer = PrimitiveUniformBuffer](FRHICommandList& RHICmdList)
@@ -24,6 +42,10 @@ FExampleSceneViewExtension::~FExampleSceneViewExtension()
 		}
 	});
 }
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 BEGIN_SHADER_PARAMETER_STRUCT(FMaterialShaderExamplePassParameters,)
 	SHADER_PARAMETER_RDG_TEXTURE(Texture2D<UlongType>, VisBuffer64)
@@ -93,6 +115,10 @@ void FExampleSceneViewExtension::PreRenderBasePass_RenderThread(
 			}
 		});
 }
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 void FExampleSceneViewExtension::ApplyMaterial(
 	const FSceneView& View,
@@ -214,7 +240,7 @@ void FExampleSceneViewExtension::ApplyMaterial(
 			}
 		}
 
-		const auto GetShadingBin = [&](const UMaterialInterface* MaterialInterface)
+		const auto GetShadingBin = [&](const UMaterialInterface* MaterialInterface) -> int32
 		{
 			if (!MaterialInterface)
 			{

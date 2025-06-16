@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "MaterialShaderExampleActor.generated.h"
 
+class UExampleStaticMeshComponent;
+
 UCLASS()
 class AMaterialShaderExampleActor : public AActor
 {
@@ -27,4 +29,8 @@ public:
 	virtual bool ShouldTickIfViewportsOnly() const override;
 	virtual void Tick(float DeltaSeconds) override;
 	//~ End AActor Interface
+
+private:
+	UPROPERTY()
+	TObjectPtr<UExampleStaticMeshComponent> StaticMeshComponent;
 };
