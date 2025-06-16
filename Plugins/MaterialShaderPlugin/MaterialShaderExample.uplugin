@@ -17,7 +17,7 @@
 		{
 			"Name": "MaterialShaderExample",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "PostConfigInit"
 		}
 	]
 }

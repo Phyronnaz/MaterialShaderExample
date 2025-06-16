@@ -21,21 +21,21 @@ void Main(const uint2 DispatchThreadId : SV_DispatchThreadID)
 		return;
 	}
 
-	FShadingMask UnpackedMask = UnpackShadingMask(MaterialSelectionParameters.ShadingMask[DispatchThreadId]);
+	FShadingMask UnpackedMask = UnpackShadingMask(ExampleMaterialShaderParameters.ShadingMask[DispatchThreadId]);
 	if (!UnpackedMask.bIsNanitePixel ||
-		UnpackedMask.ShadingBin != MaterialShaderExampleParameters.ShadingBinToReplace)
+		UnpackedMask.ShadingBin != ExampleMaterialShaderParameters.ShadingBinToReplace)
 	{
 		return;
 	}
 
-	const UlongType VisPixel = MaterialSelectionParameters.VisBuffer64[DispatchThreadId];
+	const UlongType VisPixel = ExampleMaterialShaderParameters.VisBuffer64[DispatchThreadId];
 
 	uint DepthInt = 0;
 	uint VisibleClusterIndex = 0;
 	uint TriIndex = 0;
 	UnpackVisPixel(VisPixel, DepthInt, VisibleClusterIndex, TriIndex);
 
-	const float4 SvPosition = float4(
+	float4 SvPosition = float4(
 		(DispatchThreadId + 0.5) + NaniteView.ViewRect.xy,
 		asfloat(DepthInt),
 		1.f);
@@ -77,6 +77,8 @@ void Main(const uint2 DispatchThreadId : SV_DispatchThreadID)
 
 	uint NewMaterialIndex = 0;
 	{
+		FVertexFactoryInterpolantsVSToPS Interpolants = (FVertexFactoryInterpolantsVSToPS)0;
+
 		// Setup the pixel parameters
 		FMaterialPixelParameters Parameters = FetchNaniteMaterialPixelParameters(
 			PrimitiveData,
@@ -86,7 +88,7 @@ void Main(const uint2 DispatchThreadId : SV_DispatchThreadID)
 			Tri,
 			Cluster,
 			Barycentrics,
-			(FVertexFactoryInterpolantsVSToPS)0,
+			Interpolants,
 			SvPosition);
 
 		FPixelMaterialInputs PixelMaterialInputs;
@@ -114,12 +116,12 @@ void Main(const uint2 DispatchThreadId : SV_DispatchThreadID)
 		NewMaterialIndex = 0;
 	}
 
-	uint ShadingBin = GET_SCALAR_ARRAY_ELEMENT(MaterialShaderExampleParameters.MaterialIndexToShadingBin, NewMaterialIndex);
+	uint ShadingBin = GET_SCALAR_ARRAY_ELEMENT(ExampleMaterialShaderParameters.MaterialIndexToShadingBin, NewMaterialIndex);
 
 	// Make sure to assign a valid ShadingBin
 	if (ShadingBin == -1)
 	{
-		ShadingBin = GET_SCALAR_ARRAY_ELEMENT(MaterialShaderExampleParameters.MaterialIndexToShadingBin, 0);
+		ShadingBin = GET_SCALAR_ARRAY_ELEMENT(ExampleMaterialShaderParameters.MaterialIndexToShadingBin, 0);
 
 		if (ShadingBin == -1)
 		{
@@ -128,5 +130,5 @@ void Main(const uint2 DispatchThreadId : SV_DispatchThreadID)
 	}
 
 	UnpackedMask.ShadingBin = ShadingBin;
-	MaterialShaderExampleParameters.ShadingMask[DispatchThreadId] = PackShadingMask(UnpackedMask);
+	ExampleMaterialShaderParameters.ShadingMask[DispatchThreadId] = PackShadingMask(UnpackedMask);
 }
