@@ -1,0 +1,132 @@
+// Copyright Voxel Plugin SAS. All Rights Reserved.
+
+#include "/Engine/Private/Common.ush"
+#include "/Engine/Generated/Material.ush"
+#include "/Engine/Private/Nanite/NaniteVertexFactory.ush"
+
+#if __INTELLISENSE__ || __RESHARPER__
+// Nicer intellisense, when properly compiled this is Material.ush
+#include "/Engine/Private/MaterialTemplate.ush"
+#endif
+
+[numthreads(8, 8, 1)]
+void Main(const uint2 DispatchThreadId : SV_DispatchThreadID)
+{
+	FNaniteView NaniteView = GetNaniteView(0);
+	ResolvedView = ResolveView();
+
+	if (any(DispatchThreadId > NaniteView.ViewSizeAndInvSize.xy))
+	{
+		// Beyond the screen
+		return;
+	}
+
+	FShadingMask UnpackedMask = UnpackShadingMask(MaterialSelectionParameters.ShadingMask[DispatchThreadId]);
+	if (!UnpackedMask.bIsNanitePixel ||
+		UnpackedMask.ShadingBin != MaterialShaderExampleParameters.ShadingBinToReplace)
+	{
+		return;
+	}
+
+	const UlongType VisPixel = MaterialSelectionParameters.VisBuffer64[DispatchThreadId];
+
+	uint DepthInt = 0;
+	uint VisibleClusterIndex = 0;
+	uint TriIndex = 0;
+	UnpackVisPixel(VisPixel, DepthInt, VisibleClusterIndex, TriIndex);
+
+	const float4 SvPosition = float4(
+		(DispatchThreadId + 0.5) + NaniteView.ViewRect.xy,
+		asfloat(DepthInt),
+		1.f);
+
+	const FVisibleCluster VisibleCluster = GetVisibleCluster(VisibleClusterIndex);
+	const FCluster Cluster = GetCluster(VisibleCluster.PageIndex, VisibleCluster.ClusterIndex);
+	const uint3 TriIndices = DecodeTriangleIndices(Cluster, TriIndex);
+
+	FPrimitiveSceneData PrimitiveData;
+	FInstanceSceneData InstanceData;
+	GetNaniteMaterialSceneData(VisibleCluster, PrimitiveData, InstanceData);
+
+	FInstanceDynamicData InstanceDynamicData = CalculateInstanceDynamicData(NaniteView, InstanceData);
+
+	const FNaniteVertTransforms Transforms = CalculateNaniteVertexTransforms(
+		InstanceData,
+		InstanceDynamicData,
+		NaniteView);
+
+	const FNaniteTransformedTri Tri = FetchTransformedNaniteTriangle(
+		NaniteView,
+		PrimitiveData,
+		InstanceData,
+		GetInstanceViewData(InstanceData.InstanceId, NaniteView.SceneRendererPrimaryViewId),
+		Transforms,
+		Cluster,
+		VisibleCluster,
+		TriIndices,
+		false);
+
+	const float2 PixelClip = (SvPosition.xy - NaniteView.ViewRect.xy) * NaniteView.ViewSizeAndInvSize.zw * float2(2, -2) + float2(-1, 1);
+
+	const FBarycentrics Barycentrics = CalculateTriangleBarycentrics(
+		PixelClip,
+		Tri.Verts[0].PointClip,
+		Tri.Verts[1].PointClip,
+		Tri.Verts[2].PointClip,
+		NaniteView.ViewSizeAndInvSize.zw);
+
+	uint NewMaterialIndex = 0;
+	{
+		// Setup the pixel parameters
+		FMaterialPixelParameters Parameters = FetchNaniteMaterialPixelParameters(
+			PrimitiveData,
+			InstanceData,
+			InstanceDynamicData,
+			NaniteView,
+			Tri,
+			Cluster,
+			Barycentrics,
+			(FVertexFactoryInterpolantsVSToPS)0,
+			SvPosition);
+
+		FPixelMaterialInputs PixelMaterialInputs;
+
+		// Run the material graph
+		CalcMaterialParametersEx(
+			Parameters,
+			PixelMaterialInputs,
+			SvPosition,
+			Parameters.ScreenPosition,
+			true,
+			Parameters.WorldPosition_CamRelative,
+			Parameters.WorldPosition_NoOffsets_CamRelative);
+
+		// Get the un-clamped base color from the material
+		const float3 Color = GetMaterialBaseColorRaw(PixelMaterialInputs);
+
+		// Use the color as material index
+		NewMaterialIndex = floor(Color.r);
+	}
+
+	if (NewMaterialIndex < 0 ||
+		NewMaterialIndex >= 16)
+	{
+		NewMaterialIndex = 0;
+	}
+
+	uint ShadingBin = GET_SCALAR_ARRAY_ELEMENT(MaterialShaderExampleParameters.MaterialIndexToShadingBin, NewMaterialIndex);
+
+	// Make sure to assign a valid ShadingBin
+	if (ShadingBin == -1)
+	{
+		ShadingBin = GET_SCALAR_ARRAY_ELEMENT(MaterialShaderExampleParameters.MaterialIndexToShadingBin, 0);
+
+		if (ShadingBin == -1)
+		{
+			return;
+		}
+	}
+
+	UnpackedMask.ShadingBin = ShadingBin;
+	MaterialShaderExampleParameters.ShadingMask[DispatchThreadId] = PackShadingMask(UnpackedMask);
+}
