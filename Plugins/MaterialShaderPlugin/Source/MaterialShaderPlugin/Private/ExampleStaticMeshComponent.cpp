@@ -23,7 +23,10 @@ public:
 			FMaterialSection& MaterialSection = MaterialSections.Emplace_GetRef();
 			MaterialSection.RasterMaterialProxy = Material->GetRenderProxy();
 			MaterialSection.ShadingMaterialProxy = Material->GetRenderProxy();
+			MaterialSection.MaterialIndex = 0;
 		}
+
+		OnMaterialsUpdated();
 	}
 };
 

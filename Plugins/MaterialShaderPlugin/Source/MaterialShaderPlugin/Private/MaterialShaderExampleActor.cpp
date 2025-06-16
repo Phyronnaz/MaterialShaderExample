@@ -9,6 +9,8 @@ AMaterialShaderExampleActor::AMaterialShaderExampleActor()
 	PrimaryActorTick.bCanEverTick = true;
 
 	StaticMeshComponent = CreateDefaultSubobject<UExampleStaticMeshComponent>("Mesh");
+	StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	RootComponent = StaticMeshComponent;
 }
 
@@ -20,12 +22,22 @@ bool AMaterialShaderExampleActor::ShouldTickIfViewportsOnly() const
 
 void AMaterialShaderExampleActor::Tick(float DeltaSeconds)
 {
+	for (UMaterialInterface* Material : NewMaterials)
+	{
+		if (Material)
+		{
+			Material->CheckMaterialUsage(MATUSAGE_Nanite);
+		}
+	}
+
 	// Dummy mesh component to ensure nanite materials are registered
 	if (StaticMeshComponent->Materials != NewMaterials)
 	{
 		StaticMeshComponent->Materials = NewMaterials;
 		StaticMeshComponent->MarkRenderStateDirty();
 	}
+
+	StaticMeshComponent->SetStaticMesh(DummyMesh);
 
 	// Hacky but will work fine here
 

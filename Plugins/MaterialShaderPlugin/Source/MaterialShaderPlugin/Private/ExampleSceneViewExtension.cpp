@@ -247,7 +247,7 @@ void FExampleSceneViewExtension::ApplyMaterial(
 				return -1;
 			}
 
-			const FMaterialRenderProxy* MaterialProxy = MaterialToReplace->GetRenderProxy();
+			const FMaterialRenderProxy* MaterialProxy = MaterialInterface->GetRenderProxy();
 			if (!MaterialProxy)
 			{
 				return -1;
