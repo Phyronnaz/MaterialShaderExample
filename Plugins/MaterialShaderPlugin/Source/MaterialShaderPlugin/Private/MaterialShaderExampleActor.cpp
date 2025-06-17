@@ -8,8 +8,10 @@ AMaterialShaderExampleActor::AMaterialShaderExampleActor()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	// Dummy mesh component to ensure nanite materials are registered
 	StaticMeshComponent = CreateDefaultSubobject<UExampleStaticMeshComponent>("Mesh");
 	StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	StaticMeshComponent->SetWorldScale3D(FVector::ZeroVector);
 
 	RootComponent = StaticMeshComponent;
 }
@@ -30,7 +32,6 @@ void AMaterialShaderExampleActor::Tick(float DeltaSeconds)
 		}
 	}
 
-	// Dummy mesh component to ensure nanite materials are registered
 	if (StaticMeshComponent->Materials != NewMaterials)
 	{
 		StaticMeshComponent->Materials = NewMaterials;
@@ -38,8 +39,6 @@ void AMaterialShaderExampleActor::Tick(float DeltaSeconds)
 	}
 
 	StaticMeshComponent->SetStaticMesh(DummyMesh);
-
-	// Hacky but will work fine here
 
 	UMaterialShaderExampleSubsystem* Subsystem = GEngine->GetEngineSubsystem<UMaterialShaderExampleSubsystem>();
 	if (!ensure(Subsystem))
