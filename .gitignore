@@ -9,3 +9,4 @@
 *.user
 .vsconfig
 .vs/
+_ReSharper.Caches/
