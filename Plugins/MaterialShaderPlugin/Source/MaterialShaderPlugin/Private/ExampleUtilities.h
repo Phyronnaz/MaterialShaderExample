@@ -33,27 +33,6 @@
 		auto& Property(const Class& Object); \
 	}
 
-template<typename ToType, typename FromType>
-requires
-(
-	sizeof(ToType) == sizeof(FromType) &&
-	alignof(ToType) <= alignof(FromType)
-)
-FORCEINLINE ToType& ReinterpretCastRef(FromType& From)
-{
-	return reinterpret_cast<ToType&>(From);
-}
-template<typename ToType, typename FromType>
-requires
-(
-	sizeof(ToType) == sizeof(FromType) &&
-	alignof(ToType) <= alignof(FromType)
-)
-FORCEINLINE const ToType& ReinterpretCastRef(const FromType& From)
-{
-	return reinterpret_cast<const ToType&>(From);
-}
-
 struct FExampleUtilities
 {
 	static FRDGBufferRef FindBuffer(
