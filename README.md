@@ -4,6 +4,8 @@ This project is a small example on how to do a `FMaterialShader` in Unreal Engin
 
 It also shows how to hook into the Nanite visibility buffer to replace shading bins with custom ones.
 
+A quick overview of this plugin is available here: https://victorcareil.com/making-material-shaders
+
 ## Structure
 
 All the relevant C++ code is here: https://github.com/Phyronnaz/MaterialShaderExample/tree/master/Plugins/MaterialShaderPlugin/Source/MaterialShaderPlugin/Private
