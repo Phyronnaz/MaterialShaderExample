@@ -2,16 +2,21 @@
 
 #include "MaterialShaderExampleActor.h"
 #include "MaterialShaderExampleSubsystem.h"
-#include "ExampleStaticMeshComponent.h"
 
 AMaterialShaderExampleActor::AMaterialShaderExampleActor()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Dummy mesh component to ensure nanite materials are registered
-	StaticMeshComponent = CreateDefaultSubobject<UExampleStaticMeshComponent>("Mesh");
+	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	StaticMeshComponent->SetWorldScale3D(FVector::ZeroVector);
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshWithManySections(
+		TEXT("/MaterialShaderExample/MeshWithManySections.MeshWithManySections"));
+
+	ensure(MeshWithManySections.Object);
+	StaticMeshComponent->SetStaticMesh(MeshWithManySections.Object);
 
 	RootComponent = StaticMeshComponent;
 }
@@ -24,21 +29,10 @@ bool AMaterialShaderExampleActor::ShouldTickIfViewportsOnly() const
 
 void AMaterialShaderExampleActor::Tick(float DeltaSeconds)
 {
-	for (UMaterialInterface* Material : NewMaterials)
+	for (int32 Index = 0; Index < NewMaterials.Num(); Index++)
 	{
-		if (Material)
-		{
-			Material->CheckMaterialUsage(MATUSAGE_Nanite);
-		}
+		StaticMeshComponent->SetMaterial(Index, NewMaterials[Index]);
 	}
-
-	if (StaticMeshComponent->Materials != NewMaterials)
-	{
-		StaticMeshComponent->Materials = NewMaterials;
-		StaticMeshComponent->MarkRenderStateDirty();
-	}
-
-	StaticMeshComponent->SetStaticMesh(DummyMesh);
 
 	UMaterialShaderExampleSubsystem* Subsystem = GEngine->GetEngineSubsystem<UMaterialShaderExampleSubsystem>();
 	if (!ensure(Subsystem))

@@ -1,0 +1,114 @@
+# OBJ file with 16 material sections, one triangle per section
+mtllib 16_materials.mtl
+
+# Material 1
+usemtl material_01
+v 0.0 0.0 0.0
+v 1.0 0.0 0.0
+v 0.5 1.0 0.0
+f 1 2 3
+
+# Material 2
+usemtl material_02
+v 2.0 0.0 0.0
+v 3.0 0.0 0.0
+v 2.5 1.0 0.0
+f 4 5 6
+
+# Material 3
+usemtl material_03
+v 4.0 0.0 0.0
+v 5.0 0.0 0.0
+v 4.5 1.0 0.0
+f 7 8 9
+
+# Material 4
+usemtl material_04
+v 6.0 0.0 0.0
+v 7.0 0.0 0.0
+v 6.5 1.0 0.0
+f 10 11 12
+
+# Material 5
+usemtl material_05
+v 0.0 2.0 0.0
+v 1.0 2.0 0.0
+v 0.5 3.0 0.0
+f 13 14 15
+
+# Material 6
+usemtl material_06
+v 2.0 2.0 0.0
+v 3.0 2.0 0.0
+v 2.5 3.0 0.0
+f 16 17 18
+
+# Material 7
+usemtl material_07
+v 4.0 2.0 0.0
+v 5.0 2.0 0.0
+v 4.5 3.0 0.0
+f 19 20 21
+
+# Material 8
+usemtl material_08
+v 6.0 2.0 0.0
+v 7.0 2.0 0.0
+v 6.5 3.0 0.0
+f 22 23 24
+
+# Material 9
+usemtl material_09
+v 0.0 4.0 0.0
+v 1.0 4.0 0.0
+v 0.5 5.0 0.0
+f 25 26 27
+
+# Material 10
+usemtl material_10
+v 2.0 4.0 0.0
+v 3.0 4.0 0.0
+v 2.5 5.0 0.0
+f 28 29 30
+
+# Material 11
+usemtl material_11
+v 4.0 4.0 0.0
+v 5.0 4.0 0.0
+v 4.5 5.0 0.0
+f 31 32 33
+
+# Material 12
+usemtl material_12
+v 6.0 4.0 0.0
+v 7.0 4.0 0.0
+v 6.5 5.0 0.0
+f 34 35 36
+
+# Material 13
+usemtl material_13
+v 0.0 6.0 0.0
+v 1.0 6.0 0.0
+v 0.5 7.0 0.0
+f 37 38 39
+
+# Material 14
+usemtl material_14
+v 2.0 6.0 0.0
+v 3.0 6.0 0.0
+v 2.5 7.0 0.0
+f 40 41 42
+
+# Material 15
+usemtl material_15
+v 4.0 6.0 0.0
+v 5.0 6.0 0.0
+v 4.5 7.0 0.0
+f 43 44 45
+
+# Material 16
+usemtl material_16
+v 6.0 6.0 0.0
+v 7.0 6.0 0.0
+v 6.5 7.0 0.0
+f 46 47 48
